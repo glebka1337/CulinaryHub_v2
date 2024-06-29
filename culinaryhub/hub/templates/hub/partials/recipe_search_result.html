@@ -1,0 +1,23 @@
+{% for recipe in recipes %}
+    <div class="card mb-3">
+        <div class="row g-0">
+            <div class="col-md-4">
+                <img src="{{ recipe.image.url }}" class="img-fluid rounded-start" alt="{{ recipe.name }}">
+            </div>
+            <div class="col-md-8">
+                <div class="card-body">
+                    <h5 class="card-title">{{ recipe.title}}</h5>
+                    <p class="card-text">{{ recipe.description }}</p>
+                    <a href="{{ recipe.get_absolute_url }}" class="btn btn-primary">Просмотреть рецепт</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% empty %}
+    <h6 class="text-center text-success-emphasis mt-5">Рецептов не найдено, попробуйте изменить запрос</h6>
+    <p class="text-center text-success-emphasis">
+        <a href="{% url 'add_recipe' %}" class="link-secondary">
+            Или добавьте свой рецепт!
+        </a>
+    </p>
+{% endfor %}

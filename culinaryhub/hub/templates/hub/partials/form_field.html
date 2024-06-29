@@ -1,0 +1,7 @@
+<input type="text" name="{{ field_auto_name }}"
+    class="form-control form-control-sm"
+    hx-get="{% url 'product_search_htmx' %}"
+    hx-trigger="keyup changed delay:500ms"
+    hx-target="#search_{{ field_auto_name }}"
+    hx-swap="outerhtml"
+    value="{{ name }}">

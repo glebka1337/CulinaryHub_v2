@@ -1,0 +1,78 @@
+{% extends 'hub/index.html' %}
+{% load static %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h3 class="card-title text-center">Расчет калорий</h3>
+                    {% if portions > 1 %}
+                        <p class="card-text text-center">
+                            Пищевая ценность на порцию ({{ portions }} порции):
+                        </p>
+                        <table class="table table-bordered table-striped mt-3">
+                            <thead>
+                                <tr>
+                                    <th>Питательный элемент</th>
+                                    <th>Количество на порцию</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Калории (ккал)</td>
+                                    <td>{{ recipe_nutrients.0.kcal }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Белки (г)</td>
+                                    <td>{{ recipe_nutrients.0.p }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Жиры (г)</td>
+                                    <td>{{ recipe_nutrients.0.f }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Углеводы (г)</td>
+                                    <td>{{ recipe_nutrients.0.c }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    {% endif %}
+                    <p class="card-text text-center">
+                        Пищевая ценность на 100 грамм:
+                    </p>
+                    <table class="table table-bordered table-striped mt-3">
+                        <thead>
+                            <tr>
+                                <th>Питательный элемент</th>
+                                <th>Количество на 100 г</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Калории (ккал)</td>
+                                <td>{{ recipe_nutrients.1.kcal }}</td>
+                            </tr>
+                            <tr>
+                                <td>Белки (г)</td>
+                                <td>{{ recipe_nutrients.1.p }}</td>
+                            </tr>
+                            <tr>
+                                <td>Жиры (г)</td>
+                                <td>{{ recipe_nutrients.1.f }}</td>
+                            </tr>
+                            <tr>
+                                <td>Углеводы (г)</td>
+                                <td>{{ recipe_nutrients.1.c }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

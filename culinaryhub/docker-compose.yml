@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  hub:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: hub
+    command: /bin/sh -c "python manage.py migrate && gunicorn -b 0.0.0.0:8000 culinaryhub.wsgi:application"
+    hostname: hub
+    restart:
+      always
+    expose:
+      - 8000
+    volumes:
+      - .:/culinaryhub
+      - ./static:/culinaryhub/static
+      - ./media:/culinaryhub/media
+    depends_on:
+      - psql
+    networks:
+      - culinaryhub
+    env_file:
+      - .env
+    environment:
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - HOST=${HOST}
+      - PORT=${PORT}
+
+  nginx:
+    depends_on:
+      - hub
+    image: nginx:latest
+    container_name: nginx
+    hostname: nginx
+    volumes:
+      - ./nginx/config.d:/etc/nginx/conf.d
+      - ./static:/culinaryhub/static
+      - ./media:/culinaryhub/media
+    ports:
+      - "80:80"
+    networks:
+      - culinaryhub
+
+  psql:
+    image: postgres:16.2
+    container_name: psql
+    hostname: psql
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    expose:
+      - 5432
+    volumes:
+      - ./pg_data:/var/lib/postgresql/data
+      - ./backup:/backup
+    networks:
+      - culinaryhub
+
+networks:
+  culinaryhub:
+    name: culinaryhub

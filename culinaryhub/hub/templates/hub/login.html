@@ -1,0 +1,39 @@
+{%extends 'hub/index.html'%}
+{% load static %}
+{% load custom_tags %}
+{% load django_bootstrap5 %}
+{% load widget_tweaks %}
+{% block content %}
+<div class="container-fluid align-items-center align-items-center">
+    <div class="row justify-content-center align-items-center mt-5 mb-5">
+        <div class="col-8">
+            <div class="card border-success border-5">
+                <div class="card-body">
+                    <form method="post" action="{% url 'login' %}">
+                        {% csrf_token %}
+                        {% bootstrap_messages %}
+                        {% for field in form %}
+                            {% if field.name == 'username' %}
+                            <label for="username">Имя пользователя</label>
+                            {% render_field field hx-post='/check_username/' hx-target='#username' hx-trigger='keyup changed delay:2s' hx-swap='outerhtml'%}
+                            {% if field.errors %}
+                                {% for error in field.errors %}
+                                    <p class="text-danger">{{ error }}</p>
+                                {% endfor %}
+                            {% endif %}
+                            <div id="username">
+                            </div>
+                            {% else %}
+                            {% bootstrap_field field %}
+                            {% endif %}
+                        {% endfor %}
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-danger mt-3 btn-lg">Войти</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

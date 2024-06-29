@@ -1,0 +1,26 @@
+{% extends 'hub/index.html' %}
+{% load static %}
+{% load custom_tags %}
+{% load django_bootstrap5 %}
+{% load widget_tweaks %}
+{% block content %}
+    <div class="container-fluid mt-3 mb-3">
+        <div class="row justify-content-center align-items-center">
+            <div class="col-8">
+                <div class="card border-primary border-3">
+                    <div class="card-body">
+                        <div class="input-group mb-2 mt-2">
+                        <input type="text" name="recipe" class="form-control" placeholder="Поиск рецептов"
+                            aria-label="Поиск рецептов" aria-describedby="button-addon2"
+                            hx-get="{% url 'get_recipe_search' %}" hx-target="#search-results" hx-encoding="multipart/form-data" hx-trigger="keyup changed delay:1s"
+                            hx-swap="outerhtml">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="search-results">
+        {% include 'hub/partials/recipe_search_result.html' with recipes=recipes %}
+    </div>
+{% endblock %}

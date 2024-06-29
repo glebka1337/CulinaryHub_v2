@@ -1,0 +1,33 @@
+<div class="container-fluid align-items-center">
+    <div class="row justify-content-center align-items-center mt-5 mb-5">
+        <div class="col-8">
+            <div class="card border-dark border-5">
+                <div class="card-header text-center">
+                    <h5 class="card-title">{{ header }}</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'add_recipe' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% for field in form %}
+                            <div class="row g-0 align-items-center">
+                              <div class="col-4 text-center">
+                                <label class="col-form-label"> {{ field.label }}</label>
+                                  {% if field.errors %}
+                                      {% for error in field.errors %}
+                                          <div class="alert alert-danger" role="alert">
+                                                {{ error }}
+                                          </div>
+                                      {% endfor %}
+                                  {% endif %}
+                              </div>
+                              <div class="col-8">
+                                {{ field }}
+                              </div>
+                            </div>
+                        {% endfor %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,102 @@
+{% extends 'hub/index.html' %}
+{% load static %}
+{% load custom_tags %}
+{% block content %}
+<div class="container mt-5">
+        <!-- Recipe Main Details -->
+        <div class="row mb-5">
+            <div class="col-md-6 align-items-center">
+                <img src="{% if recipe.image %}{{ recipe.image.url }}{% else %}/static/hub/images/default/default_recipe.jpg{% endif %}"
+                     class="img-fluid rounded w-100" alt="{{ recipe.title }}">
+            </div>
+            <div class="col-md-6">
+                <h1 class="mt-1 mb-2">{{ recipe.title }}</h1>
+                <div class="row">
+                    <p><em>{{ recipe.description }}</em></p>
+                </div>
+                <div class="row g-3">
+                    <div class="col-6">
+                        <p>Категория: {{ recipe.category.name }}</p>
+                        <p>Время подготовки: {% pretty_time recipe.preparation_time %}  <i class="bi bi-alarm"></i></p>
+                        <p>Время готовки: {% pretty_time recipe.cooking_time %} <i class="bi bi-alarm"></i></p>
+                        <p>Сложность: {% if recipe.difficulty == 1 %}небольшая{% elif recipe.difficulty == 2 %}средняя{% elif recipe.difficulty == 3 %}высокая{% endif %}</p>
+                        <p>Дата публикации: <em>{{ recipe.date_published|date:"m.d.Y" }}</em></p>
+                    </div>
+                    <div class="col-6">
+                        <p>Порций: {{ recipe.portions }}</p>
+                        <p>
+                            Автор:
+                            <a href="{% url 'user_profile_view' recipe.author.profile.profile_name_slug %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-person-circle"></i> {{ recipe.author.username }}
+                            </a>
+                        </p>
+                        {% if user.is_authenticated %}
+                                {% if recipe|is_favorite:user %}
+                                <form action="{% url 'remove_favorite' %}" method="post">
+                                    <input type="hidden" name="recipe_id" value="{{ recipe.id }}">
+                                    {% csrf_token %}
+                                    <button class="btn btn-danger btn-sm" type="submit">
+                                      <i class="bi bi-ban"></i> Удалить из избранного
+                                    </button>
+                                </form>
+                                {% else %}
+                                <form action="{% url 'add_favorite' %}" method="post">
+                                    <input type="hidden" name="recipe_id" value="{{ recipe.id }}">
+                                    {% csrf_token %}
+                                    <button class="btn btn-primary btn-sm" type="submit">
+                                      <i class="bi bi-bookmark-heart-fill"></i> Добавить в избранное
+                                    </button>
+                                </form>
+                                {% endif %}
+                        {% else %}
+                            <a href="{% url 'login' %}" class="link-secondary">
+                                <p class="text-danger">Авторизуйтесь, что бы сохранить рецепт в избранное</p>
+                            </a>
+                        {% endif %}
+                        <a href="#" class="btn btn-primary btn-sm mt-2">
+                          <i class="bi bi-share-fill"></i> Поделиться
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ingredients Section -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <h2>Ингредиенты</h2>
+                <ul class="list-group">
+                    {% for ingredient in recipe.ingredients.all %}
+                        <li class="list-group-item">{{ ingredient.name }} - {{ ingredient.quantity }} {{ ingredient.unit }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Steps Section -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <h2>Шаги</h2>
+                <div class="accordion" id="stepsAccordion">
+                    {% for step in recipe.steps.all %}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading{{ forloop.counter }}">
+                                <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="collapse{{ forloop.counter }}">
+                                    Шаг {{ forloop.counter }}
+                                </button>
+                            </h2>
+                            <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" aria-labelledby="heading{{ forloop.counter }}" data-bs-parent="#stepsAccordion">
+                                <div class="accordion-body">
+                                    {% if step.image %}
+                                        <img src="{{ step.image.url }}" class="img-fluid rounded mb-3" alt="Step {{ forloop.counter }}">
+                                    {% endif %}
+                                    <p>{{ step.step }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends 'hub/index.html' %}
+{% load static %}
+{% load custom_tags %}
+{% load django_bootstrap5 %}
+{% block content %}
+<h3 class="text-center mb-5">Добавить шаги</h3>
+    <div class="container-fluid w-50 border border-dark border-3 mt-2 mb-5 rounded rounded-5">
+    <form method="post" action="{% url 'recipe_steps' %}" enctype="multipart/form-data">
+    {{ formset.management_form }}
+    {% csrf_token %}
+    {% for form in formset.forms %}
+        {% with forloop.counter as step_number%}
+            {% for field in form.visible_fields %}
+                {% if field.name == 'step' %}
+                    {% bootstrap_label "Шаг №" label_class="form-label mx-2 mt-2"%}
+                    {{ step_number }}
+                    {% bootstrap_field field show_label=False %}
+                {% else %}
+                    {% bootstrap_field field %}
+                {% endif %}
+            {% endfor %}
+        {% endwith %}
+    {% endfor %}
+    {% bootstrap_form recipe_image_form %}
+    {% bootstrap_messages %}
+        <div class="text-center">
+            <button type="submit" class="btn btn-warning mt-3 mb-3">Отправить рецепт на проверку</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

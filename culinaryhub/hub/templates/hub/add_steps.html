@@ -1,0 +1,32 @@
+{% extends 'hub/index.html' %}
+{% load static %}
+{% load custom_tags %}
+{% load django_bootstrap5 %}
+{% block content %}
+<div class ="container-fluid align-items-center">
+    <div class="row row-cols-2 justify-content-center align-items-center mt-2 mb-5 g-3">
+        <div class="col-8 border border-tertiary border-3 mb-5 rounded rounded-5">
+            <form action="{% url 'add_steps' %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ formset.management_form }}
+                {% for f in formset %}
+                    {% for field in f %}
+                        {% if field.name == 'step_number' %}
+                        <label for="{{ field.id_for_label }}">Шаг номер ({{ forloop.parentloop.counter }})</label>
+                            <input value="{{ forloop.parentloop.counter }}" name="form-{{ forloop.parentloop.counter0 }}-{{ field.name }}" type="hidden">
+                        {% elif field.name == 'step' %}
+                            {% bootstrap_field field show_label=False %}
+                        {% elif field.name == 'image' %}
+                            {% bootstrap_field field %}
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+                <div class="text-center">
+                    <button class="btn btn-outline-warning" type="submit">Закончить добавление рецепта</button>
+                </div>
+            </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

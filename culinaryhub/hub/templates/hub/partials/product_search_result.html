@@ -1,0 +1,10 @@
+<div class="card border-0">
+    {% for p in products %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <button type="button" class="btn btn-outline-dark btn-sm" hx-get="{% url 'get_search' %}?field_auto_name={{ field_auto_name }}&value={{ p }}" hx-trigger="click" hx-target="#{{ field_auto_name }}" hx-swap="outerhtml">
+                {{ p }}
+            </button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+</div>

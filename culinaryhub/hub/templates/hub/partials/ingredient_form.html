@@ -1,0 +1,21 @@
+{% load django_bootstrap5 %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% bootstrap_messages %}
+<form hx-post="{% url 'ingredient_form'%}" hx-method="post" hx-target="#recipe_form" hx-swap="outerhtml" enctype="multipart/form-data" hx-header="X-CSRFToken: {{ csrf_token }}">
+    {{ formset.management_form }}
+    {% for f in formset %}
+        {% for field in f %}
+           {% if field.name == "name" %}
+               {% bootstrap_field field %}
+           {% else %}
+               <p>no</p>>
+           {% endif %}
+        {% endfor %}
+    {% endfor %}
+    {% bootstrap_messages %}
+    <div class="text-center">
+        <button class="btn btn-warning" type="button" hx-get="{% url 'save_recipe'%}" hx-target="#recipe_form" hx-swap="outerhtml">Вернуться к рецепту</button>
+        <button class="btn btn-warning" type="submit">Перейти к шагам</button>
+    </div>
+</form>

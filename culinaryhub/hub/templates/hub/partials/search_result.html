@@ -1,0 +1,11 @@
+{% if result %}
+    <div class="list-group"></div>
+    {% for r in result %}
+        <div class="list-group-item list-group-item-action">
+            <div class="btn btn-warning" hx-get="{% url 'switch_search' %}?query={{ r }}" hx-trigger="click" name="{{ r }}" hx-swap="outerhtml" hx-target="#search">
+            {{ r }}
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+{% endif %}

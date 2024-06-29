@@ -1,0 +1,143 @@
+{% load static %}
+{% load custom_tags %}
+{% load django_bootstrap5 %}
+{% load widget_tweaks %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% block title %}<title>{{ title | default:"Culinary Hub" }}</title>{% endblock %}
+    <link rel="stylesheet" href="{% static 'hub/css/bootstrap.min.css' %}">
+    <script src="{% static 'hub/js/bootstrap.bundle.min.js' %}"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <script src="https://unpkg.com/htmx.org@2.0.0" integrity="sha384-wS5l5IKJBvK6sPTKa2WZ1js3d947pvWXbPJ1OmWfEuxLgeHcEbjUUA5i9V5ZkpCw" crossorigin="anonymous"></script>
+</head>
+<body class="d-flex flex-column min-vh-100">
+    {% block navbar %}
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary border-bottom border-success border-3 p-2">
+            <div class="container-fluid">
+                <a class="navbar-brand text-success-emphasis" href="{% url 'index' %}">
+                    <i class="bi bi-egg-fried"></i> Culinary Hub
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'profile' %}">
+                                <i class="bi bi-person-circle"></i> Профиль
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'logout' %}">
+                                <i class="bi bi-box-arrow-right"></i> Выход
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'register' %}">
+                                <i class="bi bi-pencil-square"></i> Регистрация
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">
+                                <i class="bi bi-box-arrow-in-right"></i> Вход
+                            </a>
+                        </li>
+                        {% endif %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'recipe_search' %}">
+                                <i class="bi bi-search"></i> Поиск рецептов
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'product_search' %}">
+                                <i class="bi bi-calculator"></i> Посчитать калории рецепта
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-three-dots"></i> Дополнительно
+                            </a>
+                            <ul class="dropdown-menu">
+                                <!-- just a placeholder -->
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-cup-straw"></i> Поддержать автора</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-info-circle"></i> О сайте</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-lightbulb"></i> Предложения по улучшению</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    {% endblock %}
+
+    <main class="flex-fill">
+        {% block content %}
+        <div class="container-fluid mt-4">
+            <div class="row">
+                <div class="col-lg-9">
+                    <h3 class="text-center mb-3">{% if category_name %}Рецепты категории "{{ category_name }}"{% else %}Рецепты{% endif %}</h3>
+                    <div class="row row-cols-1 row-cols-md-2 g-2">
+                        {% for recipe in page_obj %}
+                        <div class="col">
+                            <div class="card h-100">
+                                <a href="{{ recipe.get_absolute_url }}">
+                                    <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.title }}">
+                                </a>
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ recipe.title }}</h5>
+                                    <p class="card-text">{{ recipe.description|truncatewords:20 }}</p>
+                                    <a href="{{ recipe.get_absolute_url }}" class="btn btn-primary">Подробнее</a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="d-flex justify-content-center mt-3">
+                        {% include 'hub/partials/pagination.html' with page_obj=page_obj %}
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <h3 class="text-center mt-2 mb-2">Фильтр по категориям</h3>
+                    <form action="{% url 'index' %}" method="get">
+                        <div class="input-group mb-3">
+                            <select class="form-select" id="categoryFilter" name="category_slug">
+                                <option selected>Выберите категорию</option>
+                                {% for category in categories %}
+                                <option value="{{ category.slug }}">{{ category.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <button class="btn btn-outline-secondary" type="submit" id="button-addon2">Фильтр</button>
+                        </div>
+                    </form>
+                    <h3 class="text-center mt-2 mb-2">Категории</h3>
+                    <ul class="list-group">
+                        {% for category in categories %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <a href="{{ category.get_absolute_url }}" class="text-decoration-none">
+                                {{ category.name }}
+                            </a>
+                            <span class="badge bg-primary rounded-pill">{{ category.recipe_count }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {% endblock %}
+    </main>
+
+    {% block footer %}
+    <footer class="mt-auto bg-light text-center py-3 border-top">
+        <div class="container">
+            <span class="text-muted">© 2024 Copyright: <a href="#" class="text-muted">Culinary Hub</a></span>
+        </div>
+    </footer>
+    {% endblock %}
+</body>
+</html>

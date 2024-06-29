@@ -1,0 +1,73 @@
+{% extends 'hub/index.html' %}
+{% load widget_tweaks %}
+{% load django_bootstrap5 %}
+{% load custom_tags %}
+{% load static %}
+{% block content %}
+<div class="container mt-4">
+    <h3 class="text-center mb-4">Калькулятор калорийности рецепта</h3>
+    <div class="row">
+        <!-- Search and Select Form Column -->
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form action="{% url 'product_search' %}" method="post">
+                        {% csrf_token %}
+                        {% bootstrap_form search_form layout='horizontal' %}
+                        <div class="d-grid gap-2 mt-3">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-search"></i> Поиск
+                            </button>
+                        </div>
+                    </form>
+                    {% if select_form %}
+                    <form action="{% url 'product_search' %}" method="post" class="mt-4">
+                        {% csrf_token %}
+                        {% bootstrap_form select_form layout='horizontal' %}
+                        <div class="d-grid gap-2 mt-3">
+                            <button type="submit" class="btn btn-secondary">
+                                <i class="bi bi-plus-circle"></i> Добавить в рецепт
+                            </button>
+                        </div>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <!-- Selected Products Column -->
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4>Добавленные продукты</h4>
+                    <ul class="list-group">
+                        {% if selected_products|length == 0 %}
+                            <li class="list-group-item">Нет добавленных продуктов</li>
+                        {% else %}
+                            {% for product in selected_products %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ product.name }}
+                                <span class="badge bg-primary rounded-pill">{{ product.weight }} г</span>
+                                <form action="{% url 'delete_product' %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="product" value="{{ product.name }}">
+                                    <button type="submit" class="btn-close" aria-label="Удалить"></button>
+                                </form>
+                            </li>
+                            {% endfor %}
+                            <form action="{% url 'calculate_calories' %}" method="post">
+                                {% csrf_token %}
+                                {% bootstrap_form additional_info_form %}
+                                <button type="submit" class="btn btn-secondary mt-3">
+                                    Посчитать калорийность
+                                </button>
+                            </form>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

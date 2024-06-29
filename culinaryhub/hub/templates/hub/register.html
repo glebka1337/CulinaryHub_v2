@@ -1,0 +1,62 @@
+{% extends 'hub/index.html' %}
+{% load static %}
+{% load custom_tags %}
+{% load django_bootstrap5 %}
+{% load widget_tweaks %}
+{% block content %}
+<div class="container-fluid align-items-center">
+    <div class="row justify-content-center align-items-center mt-5 mb-5">
+        <div class="col-8">
+            <div class="card border-danger border-3">
+                <div class="card-body">
+                    <h3 class="card-title text-center">Регистрация</h3>
+                    <hr>
+                    {% bootstrap_messages %}
+                    <form method="post" action="{% url 'register' %}">
+                        {% csrf_token %}
+                        {% for f in form %}
+                        {% if f.name == 'username' %}
+                        <label for="username">Имя пользователя</label>
+                        {% render_field f hx-post='/check_username/' hx-target='#username' hx-trigger='keyup changed delay:1s' hx-swap='outerhtml' %}
+                        <div id="username">
+                        </div>
+                        {% elif f.name == 'password1' %}
+                        <label for="password1">Подтверждение пароля</label>
+                        {% render_field f hx-post='/validate_password/' hx-target='#password1' hx-trigger='keyup changed delay:3s' hx-swap='outerhtml' %}
+                        <div id="password1">
+                        </div>
+                        {% if f.errors %}
+                            {% for error in f.errors %}
+                                <p class="text-danger">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                        {% elif f.name == 'password2' %}
+                        <label for="password2">Пароль</label>
+                        {% render_field f hx-post='/validate_password/' hx-target='#password2' hx-trigger='keyup changed delay:3s' hx-swap='outerhtml' %}
+                        <div id="password2">
+                        </div>
+                        {% if f.errors %}
+                            {% for error in f.errors %}
+                                <p class="text-danger">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                        {% else %}
+                        <label>{{ f.label }}</label>
+                        {% render_field f show_label=True id=f.name%}
+                        {% if f.errors %}
+                            {% for error in f.errors %}
+                                <p class="text-danger">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                        {% endif %}
+                        {% endfor %}
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-danger">Зарегистрироваться</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

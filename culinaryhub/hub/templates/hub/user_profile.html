@@ -1,0 +1,55 @@
+{% extends 'hub/index.html' %}
+{% load static %}
+{% load custom_tags %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row mb-5">
+        <div class="col-md-3 text-center">
+            <img src="{% get_random_avatar %}" class="img-fluid rounded-circle" alt="Аватар пользователя">
+        </div>
+        <div class="col-md-9">
+            <h1 class="text-secondary">{{ user.username }}</h1>
+            <p><strong>Электронная почта: <i class="bi bi-envelope"></i></strong> {{ user.email }}</p>
+            {% if profile.bio %}
+            <p><strong>О себе:</strong> {{ profile.bio }}</p>
+            {% else %}
+            <p><strong>О себе:</strong> Нет описания</p>
+            {% endif %}
+            <p class="text-success-emphasis">Количество подписчиков: {{ user.subscribers.count }} <i class="bi bi-person-plus"></i> </p>
+            {% if viewer|is_subscriber:user %}
+                <form action="{% url 'remove_subscriber' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="author_id" value="{{ user.id }}">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-person-dash"></i> Отписаться
+                    </button>
+                </form>
+                {% else %}
+                <form action="{% url 'add_subscriber' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="author_id" value="{{ user.id }}">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-person-plus"></i> Подписаться
+                    </button>
+                </form>
+            {% endif %}
+            <p>Количество подписчиков: {{ user.subscribers.count }}</p>
+        </div>
+    </div>
+    <div class="row mt-5">
+        <div class="col-12">
+            <h2 class="text-secondary">Рецепты</h2>
+            <div class="list-group">
+                {% for recipe in user.recipes.all %}
+                    <a href="{{ recipe.get_absolute_url }}" class="list-group-item list-group-item-action">
+                        <h5 class="mb-1"><i class="bi bi-book"></i> {{ recipe.title }}</h5>
+                        <p class="mb-1">{{ recipe.description }}</p>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
